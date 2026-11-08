@@ -558,7 +558,6 @@
       <div class="block-title">Dán URL của web cần vượt link</div>
       <div class="field">
         <span class="icon">🔗</span>
-        <!-- Đã xóa value="https://" để ô trống, chỉ giữ placeholder mờ -->
         <input id="urlInput" type="text" spellcheck="false" autocomplete="off"
                placeholder="https://...">
       </div>
@@ -762,7 +761,6 @@
 
     const raw = input.value.trim();
 
-    // Nếu ô trống
     if (!raw) {
       showError('Vui lòng dán URL của web cần vượt link.');
       return;
@@ -872,21 +870,21 @@
     if (!running) clearResult();
   });
 
+  // SỬA LẠI: CHỈ ĐỔI MÀU NÚT, KHÔNG TỰ ĐỘNG ĐIỀN LINK
   chipsEl.addEventListener('click', function (e) {
     const chip = e.target.closest('.chip');
-    if (!chip) return;
+    if (!chip || running) return;
 
+    // Bật/tắt trạng thái active (sáng lên)
     const wasActive = chip.classList.contains('active');
     Array.prototype.forEach.call(chipsEl.querySelectorAll('.chip'), function (c) {
       c.classList.remove('active');
     });
+    
     if (!wasActive) {
       chip.classList.add('active');
-      // Điền tự động domain khi bấm nút
-      input.value = 'https://' + chip.dataset.domain + '/';
-      input.focus();
-      input.setSelectionRange(input.value.length, input.value.length);
     }
+    // KHÔNG chạm vào input.value nữa, để người dùng tự dán link
   });
 
   function tickClock() {
@@ -903,4 +901,4 @@
 })();
 </script>
 </body>
-  </html>
+</html>
