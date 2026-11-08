@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bypass Tool — Vượt Link</title>
+<style>
+  :root{
+    --bg:#050506;
+    --panel:rgba(20,21,24,.72);
+    --panel-2:rgba(255,255,255,.035);
+    --line:rgba(255,255,255,.085);
+    --txt:#e8eaed;
+    --muted:#8b9099;
+    --cyan:#00e5ff;
+    --purple:#a855f7;
+    --red:#ff3b5c;
+    --green:#22e08a;
+    --amber:#ffb020;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+
+  body{
+    background:
+      radial-gradient(900px 620px at 12% -12%, rgba(0,229,255,.10), transparent 62%),
+      radial-gradient(820px 620px at 102% 112%, rgba(168,85,247,.13), transparent 62%),
+      radial-gradient(700px 500px at 50% 50%, rgba(255,255,255,.018), transparent 70%),
+      var(--bg);
+    color:var(--txt);
+    font-family:'Segoe UI', system-ui, -apple-system, 'Inter', Roboto, sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 16px;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+    background-size:46px 46px;
+    mask-image:radial-gradient(circle at 50% 40%, #000 0%, transparent 78%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .stage{position:relative;z-index:1;width:100%;max-width:760px}
+
+  .panel{
+    position:relative;
+    background:var(--panel);
+    backdrop-filter:blur(26px) saturate(170%);
+    -webkit-backdrop-filter:blur(26px) saturate(170%);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:24px;
+    overflow:hidden;
+    box-shadow:
+      0 0 0 1px rgba(0,229,255,.05),
+      0 40px 90px -20px rgba(0,0,0,.95),
+      0 0 120px -40px rgba(0,229,255,.22),
+      inset 0 1px 0 rgba(255,255,255,.07);
+    animation:panelIn .5s cubic-bezier(.2,.8,.25,1) both;
+  }
+
+  @keyframes panelIn{
+    from{opacity:0; transform:translateY(14px) scale(.985)}
+    to{opacity:1; transform:none}
+  }
+
+  .panel::before{
+    content:"";
+    position:absolute;
+    top:0; left:12%; right:12%;
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+    opacity:.85;
+    filter:blur(.3px);
+  }
+
+  .panel::after{
+    content:"";
+    position:absolute;
+    width:420px; height:420px;
+    top:-230px; right:-140px;
+    background:radial-gradient(circle, rgba(168,85,247,.20), transparent 68%);
+    pointer-events:none;
+    filter:blur(18px);
+  }
+
+  .head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:22px;
+    position:relative;
+    z-index:2;
+  }
+
+  .logo{display:flex;align-items:center;gap:13px}
+
+  .logo-mark{
+    width:44px;height:44px;
+    border-radius:13px;
+    display:grid;place-items:center;
+    font-weight:800;font-size:19px;letter-spacing:-.5px;
+    color:#04121a;
+    background:linear-gradient(135deg, var(--cyan), var(--purple));
+    box-shadow:0 0 26px rgba(0,229,255,.42), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+
+  .logo h1{
+    font-size:16.5px;
+    letter-spacing:2.4px;
+    font-weight:800;
+    background:linear-gradient(90deg,#fff,#9fe9f7 55%,#c9a6ff);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+
+  .logo p{
+    font-size:11.5px;
+    color:var(--muted);
+    letter-spacing:.4px;
+    margin-top:3px;
+  }
+
+  .status-pill{
+    display:flex;align-items:center;gap:8px;
+    font-size:10.5px;font-weight:700;letter-spacing:1.4px;
+    color:var(--green);
+    background:rgba(34,224,138,.08);
+    border:1px solid rgba(34,224,138,.28);
+    padding:7px 13px;
+    border-radius:999px;
+    white-space:nowrap;
+    box-shadow:0 0 22px -6px rgba(34,224,138,.5);
+  }
+
+  .pulse{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 10px var(--green);
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.35;transform:scale(.72)}
+  }
+
+  .block{margin-bottom:18px;position:relative;z-index:2}
+
+  .block-title{
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:11px;
+    display:flex;align-items:center;gap:8px;
+  }
+
+  .block-title::before{
+    content:"";
+    width:3px;height:12px;border-radius:2px;
+    background:linear-gradient(180deg,var(--cyan),var(--purple));
+    box-shadow:0 0 10px rgba(0,229,255,.7);
+  }
+
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+  }
+
+  .chip{
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.2px;
+    color:#a7adb6;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:9px 14px;
+    cursor:pointer;
+    transition:.18s ease;
+    position:relative;
+    user-select:none;
+  }
+
+  .chip:hover{
+    color:#fff;
+    border-color:rgba(0,229,255,.42);
+    background:rgba(0,229,255,.07);
+    transform:translateY(-1px);
+  }
+
+  .chip.active{
+    color:#061318;
+    font-weight:800;
+    background:linear-gradient(135deg, var(--cyan), #6ee7ff);
+    border-color:transparent;
+    box-shadow:0 0 22px -4px rgba(0,229,255,.75), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+
+  .chip.active::after{
+    content:"✓";
+    margin-left:7px;
+    font-size:11px;
+  }
+
+  .field{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(0,0,0,.42);
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:0 15px;
+    height:52px;
+    transition:.2s ease;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+  }
+
+  .field:focus-within{
+    border-color:rgba(0,229,255,.55);
+    box-shadow:0 0 0 3px rgba(0,229,255,.09), 0 0 30px -10px rgba(0,229,255,.6);
+  }
+
+  .field .icon{
+    color:var(--cyan);
+    font-size:14px;
+    opacity:.85;
+    flex-shrink:0;
+  }
+
+  .field input{
+    flex:1;
+    background:transparent;
+    border:none;
+    outline:none;
+    color:var(--txt);
+    font-family:inherit;
+    font-size:13.5px;
+    letter-spacing:.2px;
+    min-width:0;
+  }
+
+  .field input::placeholder{color:#5b6169}
+
+  .hint{
+    font-size:11px;
+    color:#666d76;
+    margin-top:9px;
+    padding-left:3px;
+  }
+
+  .hint b{color:var(--cyan);font-weight:700}
+
+  .cta{
+    position:relative;
+    z-index:2;
+    width:100%;
+    height:54px;
+    margin-top:4px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:800;
+    letter-spacing:2.2px;
+    color:#04121a;
+    background:linear-gradient(100deg, var(--cyan) 0%, #6ee7ff 40%, var(--purple) 100%);
+    background-size:200% 100%;
+    transition:.25s ease;
+    box-shadow:0 12px 34px -12px rgba(0,229,255,.85), inset 0 1px 0 rgba(255,255,255,.55);
+    overflow:hidden;
+  }
+
+  .cta:hover:not(:disabled){
+    background-position:100% 0;
+    transform:translateY(-1.5px);
+    box-shadow:0 18px 44px -12px rgba(168,85,247,.85), inset 0 1px 0 rgba(255,255,255,.6);
+  }
+
+  .cta:active:not(:disabled){transform:translateY(0) scale(.994)}
+
+  .cta:disabled{
+    cursor:not-allowed;
+    opacity:.82;
+    color:#0a1a22;
+    filter:saturate(.85);
+  }
+
+  .progress-track{
+    position:relative;
+    z-index:2;
+    height:4px;
+    border-radius:99px;
+    background:rgba(255,255,255,.055);
+    margin-top:16px;
+    overflow:hidden;
+  }
+
+  .progress-bar{
+    height:100%;
+    width:0%;
+    border-radius:99px;
+    background:linear-gradient(90deg,var(--cyan),var(--purple));
+    box-shadow:0 0 14px rgba(0,229,255,.8);
+  }
+
+  .meta{
+    position:relative;
+    z-index:2;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+    margin-top:16px;
+  }
+
+  .meta-item{
+    background:rgba(255,255,255,.028);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:11px;
+    padding:10px 12px;
+    min-width:0;
+  }
+
+  .meta-item span{
+    display:block;
+    font-size:9.5px;
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+    color:#6d747d;
+    font-weight:700;
+    margin-bottom:5px;
+  }
+
+  .meta-item b{
+    display:block;
+    font-size:12.5px;
+    font-weight:700;
+    color:#cfd6de;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .meta-item:nth-child(1) b{color:var(--cyan)}
+  .meta-item:nth-child(2) b{color:#c9a6ff}
+  .meta-item:nth-child(3) b{color:#9fe9f7}
+
+  .console{
+    position:relative;
+    z-index:2;
+    margin-top:16px;
+    background:rgba(0,0,0,.5);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:12px;
+    padding:12px 14px;
+    max-height:190px;
+    overflow-y:auto;
+    font-family:'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+    font-size:12px;
+    line-height:1.85;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(255,255,255,.14) transparent;
+  }
+
+  .console::-webkit-scrollbar{width:6px}
+  .console::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:9px}
+
+  .log-row{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+    animation:logIn .28s ease both;
+  }
+
+  @keyframes logIn{
+    from{opacity:0;transform:translateX(-6px)}
+    to{opacity:1;transform:none}
+  }
+
+  .log-row .dot{
+    width:5px;height:5px;
+    border-radius:50%;
+    margin-top:8px;
+    flex-shrink:0;
+    background:#4b5259;
+  }
+
+  .log-row.ready .dot{background:var(--muted); box-shadow:0 0 8px var(--muted)}
+  .log-row.ready .txt{color:#98a0a9}
+
+  .log-row.info .dot{background:var(--cyan); box-shadow:0 0 9px var(--cyan)}
+  .log-row.info .txt{color:#9fe9f7}
+
+  .log-row.ok .dot{background:var(--green); box-shadow:0 0 9px var(--green)}
+  .log-row.ok .txt{color:#6ff0b4}
+
+  .log-row.warn .dot{background:var(--amber); box-shadow:0 0 9px var(--amber)}
+  .log-row.warn .txt{color:#ffd27a}
+
+  .log-row.err .dot{background:var(--red); box-shadow:0 0 9px var(--red)}
+  .log-row.err .txt{color:#ff7d95}
+
+  .result{position:relative;z-index:2}
+
+  .result-box{
+    margin-top:14px;
+    border-radius:12px;
+    padding:14px 15px;
+    animation:logIn .32s ease both;
+    border:1px solid transparent;
+  }
+
+  .result-box.success{
+    background:rgba(34,224,138,.07);
+    border-color:rgba(34,224,138,.3);
+    box-shadow:0 0 34px -16px rgba(34,224,138,.9), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .result-box.error{
+    background:rgba(255,59,92,.06);
+    border-color:rgba(255,59,92,.32);
+    box-shadow:0 0 34px -16px rgba(255,59,92,.9), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .result-label{
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1.6px;
+    text-transform:uppercase;
+    margin-bottom:9px;
+    opacity:.9;
+  }
+
+  .result-box.success .result-label{color:var(--green)}
+  .result-box.error .result-label{color:var(--red)}
+
+  .result-text{
+    font-size:13.5px;
+    font-weight:700;
+    line-height:1.55;
+    word-break:break-word;
+  }
+
+  .result-box.success .result-text{
+    color:#6ff0b4;
+    text-shadow:0 0 22px rgba(34,224,138,.45);
+  }
+
+  .result-box.error .result-text{
+    color:var(--red);
+    text-shadow:0 0 22px rgba(255,59,92,.6);
+  }
+
+  .result-link{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:11px;
+    background:rgba(0,0,0,.42);
+    border:1px solid rgba(34,224,138,.24);
+    border-radius:10px;
+    padding:11px 12px;
+  }
+
+  .result-link a{
+    flex:1;
+    color:#9fe9f7;
+    font-size:12px;
+    font-weight:600;
+    text-decoration:none;
+    word-break:break-all;
+    font-family:ui-monospace, Consolas, monospace;
+    transition:.18s;
+  }
+
+  .result-link a:hover{color:#fff;text-decoration:underline}
+
+  .copy-btn{
+    flex-shrink:0;
+    font-family:inherit;
+    font-size:10.5px;
+    font-weight:800;
+    letter-spacing:1px;
+    color:#04121a;
+    background:linear-gradient(135deg,var(--cyan),#6ee7ff);
+    border:none;
+    border-radius:8px;
+    padding:8px 13px;
+    cursor:pointer;
+    transition:.18s;
+    box-shadow:0 0 18px -6px rgba(0,229,255,.9);
+  }
+
+  .copy-btn:hover{transform:translateY(-1px);box-shadow:0 0 24px -4px rgba(0,229,255,1)}
+
+  @media (max-width:560px){
+    body{padding:14px 10px}
+    .panel{padding:18px;border-radius:16px}
+    .logo h1{font-size:14px;letter-spacing:1.8px}
+    .logo p{font-size:10.5px}
+    .logo-mark{width:38px;height:38px;font-size:16px}
+    .status-pill{font-size:9px;padding:6px 10px;letter-spacing:1px}
+    .meta{grid-template-columns:1fr}
+    .chip{font-size:11.5px;padding:8px 12px}
+    .console{font-size:11px}
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="panel">
+
+    <header class="head">
+      <div class="logo">
+        <div class="logo-mark">B</div>
+        <div>
+          <h1>BYPASS TOOL</h1>
+          <p>Hệ thống vượt link tự động</p>
+        </div>
+      </div>
+      <div class="status-pill"><span class="pulse"></span> ONLINE</div>
+    </header>
+
+    <section class="block">
+      <div class="block-title">Ấn chọn các link trên để xác nhận</div>
+      <div class="chips" id="chips">
+        <button class="chip" data-domain="gtraffic.io">Gtraffic.io</button>
+        <button class="chip" data-domain="link4m.net">Link4m</button>
+        <button class="chip" data-domain="layma.net">Layma.net</button>
+        <button class="chip" data-domain="traffic4k.com">Traffic4k.com</button>
+        <button class="chip" data-domain="site2s.com">Site2s.com</button>
+        <button class="chip" data-domain="bbmkt.com">Bbmkt.com</button>
+        <button class="chip" data-domain="ontop.link">Ontop.link</button>
+        <button class="chip" data-domain="link999.win">Link999.win</button>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-title">Dán URL của web cần vượt link</div>
+      <div class="field">
+        <span class="icon">🔗</span>
+        <!-- Đã xóa value="https://" để ô trống, chỉ giữ placeholder mờ -->
+        <input id="urlInput" type="text" spellcheck="false" autocomplete="off"
+               placeholder="https://...">
+      </div>
+      <div class="hint">Chỉ chấp nhận liên kết bắt đầu bằng <b>https://</b></div>
+    </section>
+
+    <button class="cta" id="bypassBtn">VƯỢT LINK</button>
+
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+
+    <section class="meta">
+      <div class="meta-item"><span>Thời gian</span><b id="metaTime">--:--:--</b></div>
+      <div class="meta-item"><span>IP thiết bị</span><b id="metaIp">---.---.---.---</b></div>
+      <div class="meta-item"><span>Thiết bị</span><b id="metaDevice">Đang lấy...</b></div>
+    </section>
+
+    <div class="console" id="console"></div>
+
+    <div class="result" id="result"></div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const WAIT_MS = 15000; 
+
+  const DATABASE = {
+    'https://layma.net/5ABkvpfQu':
+      'https://www.mediafire.com/file/msusgfxw3xosdpl/AimLock+Bro.zip/file',
+    'https://link4m.net/eYerc':
+      'https://www.mediafire.com/file/yqefvmq4mefu7h5/Minecraft_PE_26.30_BANDISHARE.apk/file',
+    'https://link999.win/V5fXCj8W':
+      'https://www.mediafire.com/file/i5eioodkjudzmty/hackff+menuFFM.zip/file',
+    'https://gtraffic.io/Yv2QaKD':
+      'https://pastefy.app/bbSrxKOk/raw'
+  };
+
+  const KNOWN_DOMAINS = [
+    'gtraffic.io', 'link4m.net', 'layma.net', 'traffic4k.com',
+    'site2s.com', 'bbmkt.com', 'ontop.link', 'link999.win'
+  ];
+
+  const RATE_CONN = 0.85;   
+  const RATE_404  = 0.15;   
+
+  const $ = (s) => document.querySelector(s);
+  const input      = $('#urlInput');
+  const btn        = $('#bypassBtn');
+  const progBar    = $('#progressBar');
+  const consoleEl  = $('#console');
+  const resultEl   = $('#result');
+  const metaTime   = $('#metaTime');
+  const metaIp     = $('#metaIp');
+  const metaDevice = $('#metaDevice');
+  const chipsEl    = $('#chips');
+
+  let running = false;
+  let timers  = [];
+  let tickId  = null;
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  function nowTime() {
+    const d = new Date();
+    return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+
+  function randIp() {
+    const r = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+    return r(1, 223) + '.' + r(0, 255) + '.' + r(0, 255) + '.' + r(1, 254);
+  }
+
+  function detectDevice() {
+    const ua = navigator.userAgent || '';
+    let os = 'Không xác định';
+    if (/Windows NT 10/.test(ua))      os = 'Windows 10/11';
+    else if (/Windows/.test(ua))       os = 'Windows';
+    else if (/Android/.test(ua))       os = 'Android';
+    else if (/iPhone|iPad|iPod/.test(ua)) os = 'iOS';
+    else if (/Mac OS X/.test(ua))      os = 'macOS';
+    else if (/Linux/.test(ua))         os = 'Linux';
+
+    let br = 'Trình duyệt';
+    if (/Edg\//.test(ua))          br = 'Edge';
+    else if (/OPR\/|Opera/.test(ua)) br = 'Opera';
+    else if (/Chrome\//.test(ua))  br = 'Chrome';
+    else if (/Firefox\//.test(ua)) br = 'Firefox';
+    else if (/Safari\//.test(ua))  br = 'Safari';
+
+    return os + ' · ' + br;
+  }
+
+  function clearAll() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    if (tickId) { clearInterval(tickId); tickId = null; }
+  }
+
+  function later(fn, ms) {
+    timers.push(setTimeout(fn, ms));
+  }
+
+  function log(text, type) {
+    const row = document.createElement('div');
+    row.className = 'log-row ' + (type || 'info');
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    const txt = document.createElement('span');
+    txt.className = 'txt';
+    txt.textContent = text;
+    row.appendChild(dot);
+    row.appendChild(txt);
+    consoleEl.appendChild(row);
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+  }
+
+  function clearResult() { resultEl.innerHTML = ''; }
+
+  function showError(msg) {
+    clearResult();
+    const box = document.createElement('div');
+    box.className = 'result-box error';
+    box.innerHTML =
+      '<div class="result-label">Lỗi hệ thống</div>' +
+      '<div class="result-text"></div>';
+    box.querySelector('.result-text').textContent = msg;
+    resultEl.appendChild(box);
+    log(msg, 'err');
+  }
+
+  function showSuccess(link) {
+    clearResult();
+    const box = document.createElement('div');
+    box.className = 'result-box success';
+
+    const label = document.createElement('div');
+    label.className = 'result-label';
+    label.textContent = 'Bypass thành công — Link đã lấy được';
+
+    const text = document.createElement('div');
+    text.className = 'result-text';
+    text.textContent = 'Bạn đã vượt qua giới hạn!';
+
+    const row = document.createElement('div');
+    row.className = 'result-link';
+
+    const a = document.createElement('a');
+    a.href = link;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = link;
+
+    const copy = document.createElement('button');
+    copy.className = 'copy-btn';
+    copy.textContent = 'COPY';
+    copy.addEventListener('click', function () {
+      const done = () => {
+        copy.textContent = 'ĐÃ COPY';
+        setTimeout(() => { copy.textContent = 'COPY'; }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(done).catch(done);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = link;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        done();
+      }
+    });
+
+    row.appendChild(a);
+    row.appendChild(copy);
+    box.appendChild(label);
+    box.appendChild(text);
+    box.appendChild(row);
+    resultEl.appendChild(box);
+  }
+
+  function normalize(url) {
+    return url.trim().replace(/\/+$/, '');
+  }
+
+  function checkFormat(raw) {
+    if (!raw) return { ok: false, reason: 'empty' };
+    if (!/^https:\/\//i.test(raw)) return { ok: false, reason: 'protocol' };
+    let u;
+    try { u = new URL(raw); } catch (e) { return { ok: false, reason: 'invalid' }; }
+    const host = u.hostname.toLowerCase().replace(/^www\./, '');
+    const known = KNOWN_DOMAINS.some((d) => host === d || host.endsWith('.' + d));
+    return { ok: true, host: host, known: known };
+  }
+
+  function run() {
+    if (running) return;
+
+    const raw = input.value.trim();
+
+    // Nếu ô trống
+    if (!raw) {
+      showError('Vui lòng dán URL của web cần vượt link.');
+      return;
+    }
+
+    const fmt = checkFormat(raw);
+    if (!fmt.ok) {
+      if (fmt.reason === 'protocol') {
+        showError('Liên kết không hợp lệ! Chỉ chấp nhận URL bắt đầu bằng https://');
+      } else {
+        showError('Liên kết không hợp lệ! Vui lòng kiểm tra lại URL.');
+      }
+      return;
+    }
+
+    if (!fmt.known) {
+      showError('Domain không được hỗ trợ! Vui lòng chọn một trong các link ở trên.');
+      return;
+    }
+
+    running = true;
+    btn.disabled = true;
+    clearAll();
+    clearResult();
+    consoleEl.innerHTML = '';
+
+    progBar.style.transition = 'none';
+    progBar.style.width = '0%';
+    void progBar.offsetWidth;
+
+    metaIp.textContent = randIp();
+    metaDevice.textContent = detectDevice();
+
+    let remain = Math.round(WAIT_MS / 1000);
+    btn.textContent = 'ĐANG XỬ LÝ... ' + remain + 's';
+    tickId = setInterval(function () {
+      remain -= 1;
+      if (remain > 0) btn.textContent = 'ĐANG XỬ LÝ... ' + remain + 's';
+    }, 1000);
+
+    requestAnimationFrame(function () {
+      progBar.style.transition = 'width ' + WAIT_MS + 'ms linear';
+      progBar.style.width = '100%';
+    });
+
+    const steps = [
+      { t: 0,     text: 'Trạng thái: Sẵn sàng',              type: 'ready' },
+      { t: 500,   text: 'Đang kiểm tra kết nối...',            type: 'info'  },
+      { t: 2200,  text: 'Kết nối thành công!',                 type: 'ok'    },
+      { t: 3800,  text: 'Đang tải module...',                  type: 'info'  },
+      { t: 6200,  text: 'Tải module hoàn tất!',                type: 'ok'    },
+      { t: 8000,  text: 'Đang giả lập bypass...',              type: 'info'  },
+      { t: 10600, text: 'Bỏ qua xác thực...',                  type: 'warn'  },
+      { t: 12800, text: 'Đang xác nhận...',                    type: 'info'  }
+    ];
+
+    steps.forEach(function (s) {
+      later(function () { log(s.text, s.type); }, s.t);
+    });
+
+    later(function () {
+      const key = normalize(raw);
+      const link = DATABASE[key];
+
+      if (link) {
+        log('Bypass thành công!', 'ok');
+        later(function () {
+          log('Bạn đã vượt qua giới hạn!', 'ok');
+          finishSuccess(link);
+        }, 220);
+      } else {
+        const roll = Math.random();
+        if (roll < RATE_404) {
+          log('Xác thực thất bại!', 'err');
+          finishError('Web ghi error 404 do not accept this action');
+        } else {
+          log('Kết nối bị từ chối!', 'err');
+          finishError('Lỗi kết nối thiết bị, vui lòng kiểm tra kết nối mạng của bạn');
+        }
+      }
+    }, WAIT_MS);
+  }
+
+  function finishSuccess(link) {
+    clearAll();
+    running = false;
+    btn.disabled = false;
+    btn.textContent = 'VƯỢT LINK';
+    showSuccess(link);
+  }
+
+  function finishError(msg) {
+    clearAll();
+    running = false;
+    btn.disabled = false;
+    btn.textContent = 'VƯỢT LINK';
+    showError(msg);
+  }
+
+  btn.addEventListener('click', run);
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') run();
+  });
+
+  input.addEventListener('input', function () {
+    if (!running) clearResult();
+  });
+
+  chipsEl.addEventListener('click', function (e) {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+
+    const wasActive = chip.classList.contains('active');
+    Array.prototype.forEach.call(chipsEl.querySelectorAll('.chip'), function (c) {
+      c.classList.remove('active');
+    });
+    if (!wasActive) {
+      chip.classList.add('active');
+      // Điền tự động domain khi bấm nút
+      input.value = 'https://' + chip.dataset.domain + '/';
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
+  });
+
+  function tickClock() {
+    metaTime.textContent = nowTime();
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  metaDevice.textContent = detectDevice();
+  metaIp.textContent = randIp();
+  log('Trạng thái: Sẵn sàng', 'ready');
+  log('Hệ thống đã kết nối tới máy chủ bypass.', 'info');
+
+})();
+</script>
+</body>
+  </html>
